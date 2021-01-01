@@ -125,40 +125,23 @@ namespace ImageSearcher_Windows
             }
             else
             {
-                //lock (this.finalImages)
-                //{
-                    //IList<String> newFiles = new List<String>();
                 foreach (Tuple<string, bool, long> imagePath in files)
                 {
                     if (!imagePath.Item2)
                     {
-                        /*lock (this.uniqueFilePaths)
-                        {
-                            if (this.uniqueFilePaths.Add(imagePath.Item1))
-                            {*/
-                                this.addImage(imagePath);
-                       /*     }
-                        }*/
+                        this.addImage(imagePath);
                     }
                     else
                     {
                         lock (this.finalVideos)
                         {
-                            /*lock (this.uniqueFilePaths)
-                            {
-                                if (this.uniqueFilePaths.Add(imagePath.Item1))
-                                {*/
-                                    this.finalVideos.Add(imagePath);
-                                    this.VideoSize += imagePath.Item3;
-                                /*}
-                            }*/
+                            this.finalVideos.Add(imagePath);
+                            this.VideoSize += imagePath.Item3;
                         }
                     }
                     
                 }
-                    Console.WriteLine("Adding files to list");
-                //imageList.Items.AddRange(newFiles.ToArray());
-                //newFiles = null;
+                Console.WriteLine("Adding files to list");
                 lock (this.finalImages)
                 {
                     this.setImageLabel(0, this.finalImages.Count(), 0, this.ImageSize);
@@ -197,7 +180,6 @@ namespace ImageSearcher_Windows
                                 {
                                     sha256.TransformFinalBlock(imageBytes, 0, imageBytes.Length);
                                     hash = sha256.Hash;
-                                    //Console.WriteLine(Encoding.UTF8.GetString(hash));
                                     bool testHashBool = this.imageShas.Add(Encoding.UTF8.GetString(hash));
                                     if (!testHashBool)
                                     {
@@ -285,8 +267,6 @@ namespace ImageSearcher_Windows
             String savePath = (String)array[1];
             AutoResetEvent are = (AutoResetEvent)array[2];
             ImageSelector imageSelector = (ImageSelector)array[3];
-            //int copiedCount = 0;
-            //long copiedSize = 0;
             foreach (Tuple<string, bool, long> file in files)
             {
                 try
@@ -300,8 +280,6 @@ namespace ImageSearcher_Windows
                     {
                         imageSelector.videoMessageQueue.Enqueue(new Tuple<int, long>(1, file.Item3));
                     }
-                    //copiedCount++;
-                    //copiedSize += file.Item3;
                 }
                 catch (System.IO.IOException ex)
                 {
@@ -321,9 +299,6 @@ namespace ImageSearcher_Windows
                         {
                             imageSelector.videoMessageQueue.Enqueue(new Tuple<int, long>(1, file.Item3));
                         }
-                        //copiedCount++;
-                        //copiedSize += file.Item3;
-
                     }
                     catch (System.UnauthorizedAccessException ex2)
                     {
@@ -343,7 +318,6 @@ namespace ImageSearcher_Windows
                     continue;
                 }
             }
-            //queue.Enqueue(new Tuple<int, long>(copiedCount, copiedSize));
             are.Set();
         }
 
@@ -414,14 +388,10 @@ namespace ImageSearcher_Windows
                         this.copiedImages += imageValues.Item1;
                         this.copiedImageSize += imageValues.Item2;
                     }
-                    //this.Invoke(setImageLabelCallback, new object[] { this.copiedImages, this.finalImages.Count(), this.copiedImageSize, this.ImageSize });
                     Console.WriteLine("Updating images to: " + copiedImages.ToString() + " with size: " + copiedImageSize.ToString());
                     this.setImageLabel(this.copiedImages, this.finalImages.Count(), this.copiedImageSize, this.ImageSize);
                     imageValues = null;
                 }
-                //}
-                //while (!this.videoMessageQueue.IsEmpty)
-                //{
                 if (!videoMessageQueue.IsEmpty)
                 {
                     videoMessageQueue.TryDequeue(out videoValues);
@@ -435,7 +405,6 @@ namespace ImageSearcher_Windows
                         this.copiedVideos += videoValues.Item1;
                         this.copiedVideoSize += videoValues.Item2;
                     }
-                    //this.Invoke(setVideoLabelCallback, new object[] { this.copiedVideos, this.finalVideos.Count(), this.copiedVideoSize, this.VideoSize });
                     Console.WriteLine("Updating videos to: " + copiedVideos.ToString() + " with size: " + copiedVideoSize.ToString());
 
                     this.setVideoLabel(this.copiedVideos, this.finalVideos.Count(), this.copiedVideoSize, this.VideoSize);
@@ -573,9 +542,6 @@ namespace ImageSearcher_Windows
 
                 allQueued.Clear();
                 list.Clear();
-
-                //queueWatcher.Abort();
-
             }
             bool success = false;
             while (!success)
